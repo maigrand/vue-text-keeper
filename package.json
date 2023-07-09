@@ -1,0 +1,17 @@
+{
+  "name": "text-keeper",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "clean": "turbo daemon clean"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.6"
+  },
+  "packageManager": "npm@8.19.2",
+  "workspaces": [
+    "apps/*",
+    "services/*"
+  ]
+}
