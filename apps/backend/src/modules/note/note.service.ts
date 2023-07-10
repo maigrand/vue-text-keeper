@@ -66,10 +66,26 @@ export class NoteService {
 
         return updatedRes
     }
-    //
-    // async delete({id, userId}: { id: number, userId: number }) {
-    //
-    // }
+
+    async delete({id, userId}: { id: number, userId: number }) {
+        const res = await this.prismaService.note.findUnique({
+            where: {
+                id: id,
+            }
+        })
+
+        if (res.userId !== userId) {
+            throw new BadRequestException('Bad request')
+        }
+
+        const deletedRes = await this.prismaService.note.delete({
+            where: {
+                id: id,
+            }
+        })
+
+        return deletedRes
+    }
 
 
 }

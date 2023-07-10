@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, Param, Post, Put, Req, UseInterceptors} from '@nestjs/common'
+import {Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Req, UseInterceptors} from '@nestjs/common'
 import {NoteService} from '@/modules/note/note.service'
 import {AuthInterceptor} from '@/interceptors/auth.interceptor'
 
@@ -44,6 +44,17 @@ export class NoteController {
             id: Number(noteId),
             title: body.title,
             content: body.content,
+            userId: req['userId']
+        })
+        return note
+    }
+
+    @Delete('/:id')
+    public async delete(
+        @Req() req: Request,
+        @Param('id') noteId: number) {
+        const note = await this.noteService.delete({
+            id: Number(noteId),
             userId: req['userId']
         })
         return note
