@@ -17,7 +17,8 @@
 
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { useRequest } from '@/hooks/useRequest';
+import { AuthRes } from '@/components/app-auth/type';
 
 const router = useRouter();
 
@@ -26,24 +27,28 @@ const passwordData = ref<string>('');
 
 // @TODO: try catch
 const handleLogin = async () => {
-  const res = await axios.post('http://localhost:8082/api/auth/signin', {
+  const res = await useRequest<AuthRes>('http://localhost:8082/api/auth/signin', {
     email: emailData.value,
     password: passwordData.value,
-  });
+  }, 'POST');
 
-  localStorage.setItem('KEEPER_TOKEN', res.data.token);
-  await router.push({ name: 'home' });
+  if (res.data.value) {
+    localStorage.setItem('KEEPER_TOKEN', res.data.value.token);
+    await router.push({ name: 'home' });
+  }
 };
 
 // @TODO: try catch
 const handleRegister = async () => {
-  const res = await axios.post('http://localhost:8082/api/auth/signup', {
+  const res = await useRequest<AuthRes>('http://localhost:8082/api/auth/signup', {
     email: emailData.value,
     password: passwordData.value,
-  });
+  }, 'POST');
 
-  localStorage.setItem('KEEPER_TOKEN', res.data.token);
-  await router.push({ name: 'home' });
+  if (res.data.value) {
+    localStorage.setItem('KEEPER_TOKEN', res.data.value.token);
+    await router.push({ name: 'home' });
+  }
 };
 
 </script>

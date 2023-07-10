@@ -23,6 +23,9 @@ export class NoteService {
         const res = await this.prismaService.note.findMany({
             where: {
                 userId: userId
+            },
+            orderBy: {
+                id: 'asc'
             }
         })
 

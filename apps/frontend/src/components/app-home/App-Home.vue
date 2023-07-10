@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!noteListIsLoading" class="app-home__wrapper">
+  <div v-if="!noteListError" class="app-home__wrapper">
     <AppNoteList v-if="noteListData.length > 0" :noteList="noteListData" />
     <input v-model="inputData" type="text">
     <button @click="handleNoteCreate" type="submit">Add note</button>
@@ -8,67 +8,27 @@
 
 <script lang="ts" setup>
 
-import { onMounted, ref } from 'vue';
-import axios from 'axios';
+import { ref } from 'vue';
 import AppNoteList from '@/components/app-note-list/App-Note-List.vue';
-import {useRequest} from '@/hooks/useRequest'
+import { useRequest } from '@/hooks/useRequest';
+import { Note } from '@/types/note';
 
-const noteList = ref<
-    {
-      id: string;
-      title: string;
-      content?: string;
-      userId: number;
-    }[]
->([]);
 const inputData = ref<string>('');
 
-// const getNotes = async () => {
-//   const response = await axios.get('http://localhost:8082/api/note', {
-//     headers: {
-//       'Content-Type': 'application/json',
-//       Authorization: `Bearer ${localStorage.getItem('KEEPER_TOKEN')}`,
-//     },
-//   });
-//   const { data } = response;
-//   noteList.value = data;
-// };
-
-const {
-  data: noteListData,
-  isLoading: noteListIsLoading,
-  error: noteListError,
-} = useRequest<{
-  id: string;
-  title: string;
-  content?: string;
-  userId: number;
-}[]>(`http://localhost:8082/api/note`);
+const { data: noteListData, error: noteListError } = await useRequest<Note[]>(`http://localhost:8082/api/note`);
 
 const handleNoteCreate = async () => {
-  // const res = await axios.post('http://localhost:8082/api/note', {
-  //   title: inputData.value,
-  // }, {
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     Authorization: `Bearer ${localStorage.getItem('KEEPER_TOKEN')}`,
-  //   },
-  // });
-  // noteList.value = [...noteList.value, res.data];
   const body = {
     title: inputData.value,
   };
-  const { data } = useRequest<{
-    id: string;
-    title: string;
-    content?: string;
-    userId: number;
-  }>(`http://localhost:8082/api/note`, body, 'POST');
+  const { data } = await useRequest<Note>(`http://localhost:8082/api/note`, body, 'POST');
+  if (data.value) {
+    if (!noteListData.value) {
+      noteListData.value = [];
+    }
+    noteListData.value = [...noteListData.value, data.value];
+  }
 };
-
-// onMounted(() => {
-//   getNotes();
-// });
 
 </script>
 

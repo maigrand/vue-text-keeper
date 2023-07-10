@@ -2,26 +2,24 @@
   <div class="app-note-list__wrapper">
     <div class="app-note-list__list">
       <button v-for="note in noteList" class="app-note-list__item" :key="note.id" @click="handleClick(note)" type="submit">
-        <div class="app-note-list__title">{{ note.title }}</div>
+        <span class="app-note-list__title">{{ note.title }}</span>
       </button>
     </div>
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 
 import { useRouter } from 'vue-router';
+import { Note } from '@/types/note';
 
-defineProps({
-  noteList: {
-    type: Array,
-    required: true,
-  },
-});
+defineProps<{
+  noteList: Note[];
+}>();
 
 const router = useRouter();
 
-const handleClick = async (note) => {
+const handleClick = async (note: Note) => {
   await router.push({
     name: 'note',
     params: {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!noteIsLoading" class="app-note__wrapper">
+  <div v-if="!noteError" class="app-note__wrapper">
     <input v-model="title" type="text">
     <input v-model="content" type="text">
     <button @click="handleUpdateNote" type="submit">Update note</button>
@@ -9,8 +9,9 @@
 
 <script lang="ts" setup>
 import { useRoute, useRouter } from 'vue-router';
-import { ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRequest } from '@/hooks/useRequest';
+import { Note } from '@/types/note';
 
 const router = useRouter();
 const route = useRoute();
@@ -19,47 +20,30 @@ const noteId = route.params.id;
 const title = ref<string>('');
 const content = ref<string>('');
 
-const {
-  data: noteData,
-  isLoading: noteIsLoading,
-  error: noteError,
-} = useRequest<{
-  id: string;
-  title: string;
-  content?: string;
-  userId: number;
-}>(`http://localhost:8082/api/note/${noteId}`);
+const { data: noteData, error: noteError } = await useRequest<Note>(`http://localhost:8082/api/note/${noteId}`);
 
-const handleUpdateNote = () => {
+const handleUpdateNote = async () => {
   const body = {
     title: title.value,
     content: content.value,
   };
-  const { data } = useRequest<{
-    id: string;
-    title: string;
-    content?: string;
-    userId: number;
-  }>(`http://localhost:8082/api/note/${noteId}`, body, 'PUT');
-  noteData.value = data.value;
+  const { data } = await useRequest<Note>(`http://localhost:8082/api/note/${noteId}`, body, 'PUT');
+  if (data.value) {
+    noteData.value = data.value;
+  }
 };
 
-const handleDeleteNote = () => {
-  useRequest<{
-    id: string;
-    title: string;
-    content?: string;
-    userId: number;
-  }>(`http://localhost:8082/api/note/${noteId}`, {}, 'DELETE');
-  router.push({ name: 'home' });
+const handleDeleteNote = async () => {
+  await useRequest<Note>(`http://localhost:8082/api/note/${noteId}`, {}, 'DELETE');
+  await router.push({ name: 'home' });
 };
 
-watch(noteData, (note) => {
-  if (!note) {
+onMounted(() => {
+  if (!noteData.value) {
     return;
   }
-  title.value = note.title;
-  content.value = note.content || '';
+  title.value = noteData.value.title;
+  content.value = noteData.value.content || '';
 });
 
 </script>

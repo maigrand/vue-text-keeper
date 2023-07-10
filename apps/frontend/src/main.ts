@@ -14,10 +14,6 @@ router.beforeEach((to, from, next) => {
     next({
       name: 'auth',
     });
-    // next({
-    //   path: '/auth',
-    //   params: { nextUrl: to.fullPath },
-    // });
   } else {
     next();
   }
