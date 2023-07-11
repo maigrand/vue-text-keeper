@@ -1,11 +1,6 @@
 <template>
   <div id="app">
-    <Suspense>
-      <router-view />
-      <template #fallback>
-        Loading...
-      </template>
-    </Suspense>
+    <router-view />
   </div>
 </template>
 

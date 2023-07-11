@@ -1,6 +1,6 @@
 <template>
-  <div v-if="!noteListError" class="app-home__wrapper">
-    <AppNoteList v-if="noteListData.length > 0" :noteList="noteListData" />
+  <div v-if="!noteListState.error" class="app-home__wrapper">
+    <AppNoteList v-if="noteListState.data.length > 0" :noteList="noteListState.data" />
     <input v-model="inputData" type="text">
     <button @click="handleNoteCreate" type="submit">Add note</button>
   </div>
@@ -8,14 +8,19 @@
 
 <script lang="ts" setup>
 
-import { ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import AppNoteList from '@/components/app-note-list/App-Note-List.vue';
 import { useRequest } from '@/hooks/useRequest';
 import { Note } from '@/types/note';
 
 const inputData = ref<string>('');
-
-const { data: noteListData, error: noteListError } = await useRequest<Note[]>(`http://localhost:8082/api/note`);
+const noteListState = reactive<{
+  data: Note[],
+  error: string,
+}>({
+  data: [],
+  error: '',
+});
 
 const handleNoteCreate = async () => {
   const body = {
@@ -23,12 +28,21 @@ const handleNoteCreate = async () => {
   };
   const { data } = await useRequest<Note>(`http://localhost:8082/api/note`, body, 'POST');
   if (data.value) {
-    if (!noteListData.value) {
-      noteListData.value = [];
+    if (noteListState.data.length === 0) {
+      noteListState.data = [];
     }
-    noteListData.value = [...noteListData.value, data.value];
+    noteListState.data = [...noteListState.data, data.value];
   }
 };
+
+onMounted(async () => {
+  const { data, error } = await useRequest<Note[]>(`http://localhost:8082/api/note`);
+  if (data.value) {
+    noteListState.data = data.value;
+  } else if (error) {
+    noteListState.error = error.value;
+  }
+});
 
 </script>
 
