@@ -1,17 +1,31 @@
 {
   "name": "text-keeper",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "turbo run build",
-    "start": "turbo run start",
-    "clean": "turbo daemon clean"
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start:mockserver": "node server/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "sass": "^1.63.6",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
   },
   "devDependencies": {
-    "turbo": "^1.10.6"
-  },
-  "packageManager": "npm@8.19.2",
-  "workspaces": [
-    "apps/*",
-    "services/*"
-  ]
+    "@fastify/cors": "^8.3.0",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/eslint-config-airbnb": "^7.0.0",
+    "@vue/eslint-config-typescript": "^11.0.2",
+    "eslint": "^8.44.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-vue": "^9.5.1",
+    "fastify": "^4.19.2",
+    "typescript": "~4.5.5",
+    "vite": "^4.4.2"
+  }
 }
