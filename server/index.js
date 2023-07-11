@@ -31,6 +31,7 @@ fastify.listen({ port: 8082 }, (err, address) => {
 
 fastify.post('/api/auth/signin', async (request, reply) => {
   try {
+    await timeout();
     const { email, password } = request.body;
     if (email === 'root' && password === 'root') {
       reply.send({
@@ -53,6 +54,7 @@ fastify.post('/api/auth/signin', async (request, reply) => {
 
 fastify.get('/api/note', async (request, reply) => {
   try {
+    await timeout();
     reply.send(notes);
   } catch (e) {
     reply.status(500).send({
@@ -64,6 +66,7 @@ fastify.get('/api/note', async (request, reply) => {
 
 fastify.post('/api/note', async (request, reply) => {
   try {
+    await timeout();
     const { title, content } = request.body;
     const newNote = {
       id: notes.length + 1,
@@ -82,6 +85,7 @@ fastify.post('/api/note', async (request, reply) => {
 
 fastify.put('/api/note/:id', async (request, reply) => {
   try {
+    await timeout();
     const { id } = request.params;
     const note = notes.find((noteEl) => noteEl.id === Number(id));
     const { title, content } = request.body;
@@ -98,6 +102,7 @@ fastify.put('/api/note/:id', async (request, reply) => {
 
 fastify.delete('/api/note/:id', async (request, reply) => {
   try {
+    await timeout();
     const { id } = request.params;
     const noteIndex = notes.findIndex((noteEl) => noteEl.id === Number(id));
     notes.splice(noteIndex, 1);
@@ -115,6 +120,7 @@ fastify.delete('/api/note/:id', async (request, reply) => {
 
 fastify.get('/api/note/:id', async (request, reply) => {
   try {
+    await timeout();
     const { id } = request.params;
     const note = notes.find((noteEl) => noteEl.id === Number(id));
     reply.send(note);
@@ -125,3 +131,15 @@ fastify.get('/api/note/:id', async (request, reply) => {
     });
   }
 });
+
+function timeout() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() > 0.3) {
+        resolve();
+      } else {
+        reject(new Error('Random Error'));
+      }
+    }, 300);
+  });
+}

@@ -1,10 +1,10 @@
 import { ref } from 'vue';
 import axios from 'axios';
+import { ApiException } from '@/types/note';
 
 export async function useRequest<T>(url: string, body?: any, method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET') {
   const data = ref<T>();
-  const isLoading = ref<boolean>(true);
-  const error = ref<string>('');
+  const error = ref<ApiException>();
 
   try {
     const res = await axios.request({
@@ -19,14 +19,16 @@ export async function useRequest<T>(url: string, body?: any, method: 'GET' | 'PO
 
     data.value = res.data;
   } catch (e: unknown) {
-    error.value = JSON.stringify(e);
-  } finally {
-    isLoading.value = false;
+    if (axios.isAxiosError(e)) {
+      error.value = e.response?.data as ApiException;
+    } else {
+      // @TODO: переделать на нормальный тип ошибки
+      error.value = e as ApiException;
+    }
   }
 
   return {
     data,
-    isLoading,
     error,
   };
 }

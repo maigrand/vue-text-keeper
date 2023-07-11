@@ -4,3 +4,8 @@ export type Note = {
     content?: string;
     userId: number,
 }
+
+export type ApiException = {
+    statusCode: number,
+    message: string,
+}

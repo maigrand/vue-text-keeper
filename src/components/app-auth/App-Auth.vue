@@ -10,6 +10,9 @@
         <button class="app-auth__button" @click="handleRegister" type="submit">Register (W.I.P.)</button>
       </div>
     </div>
+    <div v-if="error">
+      <AppError :error="error" />
+    </div>
   </div>
 </template>
 
@@ -19,11 +22,14 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRequest } from '@/hooks/useRequest';
 import { AuthRes } from '@/components/app-auth/type';
+import { ApiException } from '@/types/note';
+import AppError from '@/components/app-error/App-Error.vue';
 
 const router = useRouter();
 
 const emailData = ref<string>('');
 const passwordData = ref<string>('');
+const error = ref<ApiException | null>(null);
 
 // @TODO: try catch
 const handleLogin = async () => {
@@ -35,6 +41,8 @@ const handleLogin = async () => {
   if (res.data.value) {
     localStorage.setItem('KEEPER_TOKEN', res.data.value.token);
     await router.push({ name: 'home' });
+  } else if (res.error.value) {
+    error.value = res.error.value;
   }
 };
 
