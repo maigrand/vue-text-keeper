@@ -21,8 +21,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRequest } from '@/hooks/useRequest';
-import { AuthRes } from '@/components/app-auth/type';
-import { ApiException } from '@/types/note';
+import { AuthRes } from '@/components/app-auth/types';
+import { ApiException } from '@/types/commonTypes';
 import AppError from '@/components/app-error/App-Error.vue';
 
 const router = useRouter();
@@ -33,7 +33,7 @@ const error = ref<ApiException | null>(null);
 
 // @TODO: try catch
 const handleLogin = async () => {
-  const res = await useRequest<AuthRes>('http://localhost:8082/api/auth/signin', {
+  const res = await useRequest<AuthRes>('/api/auth/signin', {
     email: emailData.value,
     password: passwordData.value,
   }, 'POST');
@@ -48,7 +48,7 @@ const handleLogin = async () => {
 
 // @TODO: try catch
 const handleRegister = async () => {
-  const res = await useRequest<AuthRes>('http://localhost:8082/api/auth/signup', {
+  const res = await useRequest<AuthRes>('/api/auth/signup', {
     email: emailData.value,
     password: passwordData.value,
   }, 'POST');

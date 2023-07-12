@@ -1,4 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import Fastify from 'fastify';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import FastifyCors from '@fastify/cors';
 
 const notes = [
@@ -124,6 +126,22 @@ fastify.get('/api/note/:id', async (request, reply) => {
     const { id } = request.params;
     const note = notes.find((noteEl) => noteEl.id === Number(id));
     reply.send(note);
+  } catch (e) {
+    reply.status(500).send({
+      statusCode: 500,
+      message: 'WTF',
+    });
+  }
+});
+
+fastify.get('/api/profile', async (request, reply) => {
+  try {
+    await timeout();
+    const user = {
+      id: 1,
+      email: 'root',
+    };
+    reply.send(user);
   } catch (e) {
     reply.status(500).send({
       statusCode: 500,

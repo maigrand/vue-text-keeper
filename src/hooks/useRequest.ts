@@ -1,6 +1,8 @@
 import { ref } from 'vue';
 import axios from 'axios';
-import { ApiException } from '@/types/note';
+import { ApiException } from '@/types/commonTypes';
+
+const BACKEND_URL = 'http://localhost:8082';
 
 export async function useRequest<T>(url: string, body?: any, method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET') {
   const data = ref<T>();
@@ -8,7 +10,7 @@ export async function useRequest<T>(url: string, body?: any, method: 'GET' | 'PO
 
   try {
     const res = await axios.request({
-      url,
+      url: `${BACKEND_URL}${url}`,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('KEEPER_TOKEN')}`,
