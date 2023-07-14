@@ -28,6 +28,7 @@ fastify.listen({ port: 8082 }, (err, address) => {
   if (err) {
     throw err;
   }
+  // eslint-disable-next-line no-console
   console.log(`Server is now listening on ${address}`);
 });
 
@@ -57,7 +58,7 @@ fastify.post('/api/auth/signin', async (request, reply) => {
 fastify.get('/api/note', async (request, reply) => {
   try {
     await timeout();
-    reply.send(notes);
+    reply.send(notes.sort((a, b) => b.id - a.id));
   } catch (e) {
     reply.status(500).send({
       statusCode: 500,
@@ -151,12 +152,17 @@ fastify.get('/api/profile', async (request, reply) => {
 });
 
 function timeout() {
+  const isErrorChance = false;
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (Math.random() > 0.3) {
-        resolve();
+      if (isErrorChance) {
+        if (Math.random() > 0.3) {
+          resolve();
+        } else {
+          reject(new Error('Random Error'));
+        }
       } else {
-        reject(new Error('Random Error'));
+        resolve();
       }
     }, 300);
   });

@@ -1,71 +1,55 @@
 <template>
   <div class="app-note-list__wrapper">
-    <div v-if="viewMode === 'LIST'" class="app-note-list__list">
+
+    <div v-if="store.notes" class="app-note-list__notes">
       <button
-        type="submit"
-        @click="toggleViewMode"
-      >
-        <span class="app-note-list__title">Add note</span>
-      </button>
-      <button
-        v-for="note in noteListState.data"
-        class="app-note-list__item"
+        v-for="note in store.notes"
         :key="note.id"
-        @click="handleClick(note)"
-        type="submit"
+        @click="setSelected(note.id)"
+        class="app-note-list__button"
+        type="button"
       >
-        <span class="app-note-list__title">{{ note.title }}</span>
+        <span
+          class="app-note-list__note"
+        >
+          {{ note.title }}
+        </span>
       </button>
     </div>
-    <div v-else-if="viewMode === 'ADD'">
-      <h1>test</h1>
-    </div>
-    <div v-if="noteListState.error">
-      <AppError :error="noteListState.error" />
-    </div>
+
+    <AppError
+      v-if="error"
+      :error="error"
+    />
+
   </div>
 </template>
 
 <script lang="ts" setup>
 
-import { useRouter } from 'vue-router';
 import { useRequest } from '@/hooks/useRequest';
-import { onMounted, reactive, ref } from 'vue';
-import { NoteListState } from '@/components/app-note-list/types';
-import { Note } from '@/types/commonTypes';
+import { onMounted, ref } from 'vue';
+import { NoteListEmits } from '@/components/app-note-list/types';
+import { ApiException, Note } from '@/types/commonTypes';
 import AppError from '@/components/app-error/App-Error.vue';
+import { useNoteStore } from '@/stores/useNoteStore';
 
-const router = useRouter();
+const store = useNoteStore();
 
-const noteListState = reactive<NoteListState>({
-  data: [],
-  error: null,
-});
-const viewMode = ref<'LIST' | 'ADD'>('LIST');
+const error = ref<ApiException | null>(null);
 
-const toggleViewMode = () => {
-  if (viewMode.value === 'LIST') {
-    viewMode.value = 'ADD';
-  } else {
-    viewMode.value = 'LIST';
-  }
-};
+const emit = defineEmits<NoteListEmits>();
 
-const handleClick = async (note: Note) => {
-  await router.push({
-    name: 'note',
-    params: {
-      id: note.id,
-    },
-  });
-};
+const setSelected = (noteId: number) => emit('set-selected', noteId);
 
 onMounted(async () => {
-  const { data, error } = await useRequest<Note[]>('/api/note');
+  const { data, error: apiError } = await useRequest<Note[]>('/api/note');
   if (data.value) {
-    noteListState.data = data.value;
-  } else if (error.value) {
-    noteListState.error = error.value;
+    store.$patch({
+      notes: data.value,
+    });
+  } else if (apiError.value) {
+    error.value = apiError.value;
   }
 });
 
@@ -80,33 +64,24 @@ onMounted(async () => {
     justify-content: center;
   }
 
-  &__list {
+  &__notes {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
   }
 
-  &__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #D4D2DE;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    background-color: transparent;
+  &__button {
+    border: 8px solid transparent;
+    border-radius: 4px;
+    background-color: #323232;
     color: white;
+    margin: 8px;
+    cursor: pointer;
   }
 
-  &__title {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
+  &__note {
+    margin-top: 8px;
   }
 
 }

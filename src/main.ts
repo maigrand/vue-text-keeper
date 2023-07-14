@@ -1,24 +1,11 @@
 import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
-import { routes } from '@/routes';
+import { createPinia } from 'pinia';
+import { router } from '@/router';
 import App from './App.vue';
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-});
-
-router.beforeEach((to, from, next) => {
-  const keeperToken = localStorage.getItem("KEEPER_TOKEN");
-  if (!keeperToken && to.path !== '/auth') {
-    next({
-      name: 'auth',
-    });
-  } else {
-    next();
-  }
-});
+const pinia = createPinia();
 
 createApp(App)
   .use(router)
+  .use(pinia)
   .mount('#app');
