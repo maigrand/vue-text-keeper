@@ -8,6 +8,7 @@
     <div class="app-home__body">
 
       <div class="app-home__left-menu">
+        <span>Notes</span>
         <input
           v-model="newNoteTitle"
           @keydown.enter="handleAddNote"

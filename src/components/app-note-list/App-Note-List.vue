@@ -2,19 +2,17 @@
   <div class="app-note-list__wrapper">
 
     <div v-if="store.notes" class="app-note-list__notes">
-      <button
+      <AppButton
         v-for="note in store.notes"
         :key="note.id"
         @click="setSelected(note.id)"
-        class="app-note-list__button"
-        type="button"
       >
         <span
           class="app-note-list__note"
         >
           {{ note.title }}
         </span>
-      </button>
+      </AppButton>
     </div>
 
   </div>
@@ -24,6 +22,7 @@
 
 import { onMounted } from 'vue';
 import { useNoteStore } from '@/stores/useNoteStore';
+import AppButton from '@/components/app-button/App-Button.vue';
 
 const store = useNoteStore();
 

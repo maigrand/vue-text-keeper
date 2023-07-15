@@ -3,10 +3,18 @@
 
     <div v-if="isLoading">Loading...</div>
 
-    <div v-else-if="store.selectedNote">
-      <input v-model="title" type="text">
-      <input v-model="content" type="text">
-      <button @click="handleDeleteNote" type="submit">Delete note</button>
+    <div
+      v-else-if="store.selectedNote"
+      class="app-note__content"
+    >
+      <input v-model="title" type="text" class="app-note__content--title">
+      <input v-model="content" type="text" class="app-note__content--content">
+      <AppButton
+        @click="handleDeleteNote"
+        class="app-note__content--button"
+      >
+        Delete note
+      </AppButton>
     </div>
 
   </div>
@@ -17,6 +25,7 @@ import {
   onMounted, ref, watch, computed,
 } from 'vue';
 import { useNoteStore } from '@/stores/useNoteStore';
+import AppButton from '@/components/app-button/App-Button.vue';
 
 const store = useNoteStore();
 const noteId = computed(() => store.selectedNoteId);
@@ -65,10 +74,34 @@ watch(content, async (value) => {
 </script>
 
 <style lang="scss" scoped>
-.app-note__wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.app-note {
+  &__wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  &__content {
+    margin: 20px;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 16px;
+  }
+  &__content--title {
+    border: none;
+    outline: none;
+    background-color: #232323;
+    color: white;
+    height: 20px;
+  }
+  &__content--content {
+    border: none;
+    outline: none;
+    background-color: #232323;
+    color: white;
+  }
+  &__content--button {
+    margin: 0;
+    width: 140px;
+  }
 }
 </style>
