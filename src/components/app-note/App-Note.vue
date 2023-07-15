@@ -9,81 +9,44 @@
       <button @click="handleDeleteNote" type="submit">Delete note</button>
     </div>
 
-    <div v-if="apiError">
-      <AppError :error="apiError" />
-    </div>
-
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
 import {
-  onMounted, ref, watch,
+  onMounted, ref, watch, computed,
 } from 'vue';
-import { useRequest } from '@/hooks/useRequest';
-import AppError from '@/components/app-error/App-Error.vue';
-import { ApiException, Note } from '@/types/commonTypes';
 import { useNoteStore } from '@/stores/useNoteStore';
-import { NoteProps } from './types';
 
 const store = useNoteStore();
-
-const router = useRouter();
-
-const props = defineProps<NoteProps>();
-
-const apiError = ref<ApiException | null>(null);
+const noteId = computed(() => store.selectedNoteId);
 const isLoading = ref<boolean>(false);
 const title = ref<string>('');
 const content = ref<string>('');
 
 const handleUpdateNote = async () => {
-  const body = {
-    title: title.value,
-    content: content.value,
-  };
-  const { data, error } = await useRequest<Note>(`/api/note/${props.id}`, body, 'PUT');
-  if (data.value) {
-    store.setSelectedNote(data.value);
-  } else if (error.value) {
-    apiError.value = error.value;
+  if (!noteId.value) {
+    return;
   }
+  await store.updateNote(noteId.value, title.value, content.value);
 };
 
 const handleDeleteNote = async () => {
-  const { error } = await useRequest<Note>(`/api/note/${props.id}`, {}, 'DELETE');
-  if (error.value) {
-    apiError.value = error.value;
-  } else {
-    store.deleteNote(props.id);
-    await router.push({ name: 'home' });
+  if (!noteId.value) {
+    return;
   }
+  await store.deleteNote(noteId.value);
 };
 
 onMounted(async () => {
-  const { data, error } = await useRequest<Note>(`/api/note/${props.id}`);
-  if (data.value) {
-    store.setSelectedNote(data.value);
-    title.value = store.selectedNote?.title || '';
-    content.value = store.selectedNote?.content || '';
-  } else if (error.value) {
-    apiError.value = error.value;
-  }
+  title.value = store.selectedNote?.title || '';
+  content.value = store.selectedNote?.content || '';
 });
 
-watch(props, async (value) => {
-  if (value.id) {
-    isLoading.value = true;
-    const { data, error } = await useRequest<Note>(`/api/note/${props.id}`);
-    if (data.value) {
-      store.setSelectedNote(data.value);
-      title.value = store.selectedNote?.title || '';
-      content.value = store.selectedNote?.content || '';
-    } else if (error.value) {
-      apiError.value = error.value;
-    }
-    isLoading.value = false;
+watch(noteId, async (value) => {
+  if (value) {
+    title.value = store.selectedNote?.title || '';
+    content.value = store.selectedNote?.content || '';
   }
 });
 

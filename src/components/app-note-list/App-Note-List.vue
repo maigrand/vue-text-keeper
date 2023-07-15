@@ -17,40 +17,24 @@
       </button>
     </div>
 
-    <AppError
-      v-if="error"
-      :error="error"
-    />
-
   </div>
 </template>
 
 <script lang="ts" setup>
 
-import { useRequest } from '@/hooks/useRequest';
-import { onMounted, ref } from 'vue';
-import { NoteListEmits } from '@/components/app-note-list/types';
-import { ApiException, Note } from '@/types/commonTypes';
-import AppError from '@/components/app-error/App-Error.vue';
+import { onMounted } from 'vue';
 import { useNoteStore } from '@/stores/useNoteStore';
 
 const store = useNoteStore();
 
-const error = ref<ApiException | null>(null);
-
-const emit = defineEmits<NoteListEmits>();
-
-const setSelected = (noteId: number) => emit('set-selected', noteId);
+const setSelected = (noteId: number) => {
+  store.$patch({
+    selectedNoteId: noteId,
+  });
+};
 
 onMounted(async () => {
-  const { data, error: apiError } = await useRequest<Note[]>('/api/note');
-  if (data.value) {
-    store.$patch({
-      notes: data.value,
-    });
-  } else if (apiError.value) {
-    error.value = apiError.value;
-  }
+  await store.fetchNotes();
 });
 
 </script>

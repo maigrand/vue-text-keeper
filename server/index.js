@@ -16,6 +16,8 @@ const notes = [
   },
 ];
 
+let idCounter = 3;
+
 const fastify = Fastify({
   logger: true,
 });
@@ -72,10 +74,11 @@ fastify.post('/api/note', async (request, reply) => {
     await timeout();
     const { title, content } = request.body;
     const newNote = {
-      id: notes.length + 1,
+      id: idCounter,
       title,
       content,
     };
+    idCounter += 1;
     notes.push(newNote);
     reply.send(newNote);
   } catch (e) {

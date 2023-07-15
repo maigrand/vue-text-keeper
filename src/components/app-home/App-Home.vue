@@ -14,18 +14,17 @@
           type="text"
         />
         //@TODO: search by name
-        <AppNoteList @set-selected="setSelected" />
+        <AppNoteList />
       </div>
 
-      <div v-if="selectedNoteId" class="app-home__content">
-        <AppNote :id="selectedNoteId" />
+      <div v-if="store.selectedNoteId" class="app-home__content">
+        <AppNote />
       </div>
 
     </div>
 
-    <div v-if="profileState.error">
-      <AppError :error="profileState.error" />
-    </div>
+    <AppError v-if="profileState.error" :error="profileState.error" />
+    <AppError v-if="store.storeApiError" :error="store.storeApiError" />
 
   </div>
 </template>
@@ -47,13 +46,7 @@ const profileState: ProfileState = reactive({
 });
 
 const store = useNoteStore();
-
-const selectedNoteId = ref<number | null>(null);
 const newNoteTitle = ref<string | null>(null);
-
-const setSelected = (noteId: number) => {
-  selectedNoteId.value = noteId;
-};
 
 const handleAddNote = () => {
   store.addNote(newNoteTitle.value);

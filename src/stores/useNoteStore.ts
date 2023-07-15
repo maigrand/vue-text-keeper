@@ -1,27 +1,41 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { Note } from '@/types/commonTypes';
+import { computed, ref } from 'vue';
+import { ApiException, Note } from '@/types/commonTypes';
 import { useRequest } from '@/hooks/useRequest';
 
 export const useNoteStore = defineStore('note', () => {
   const notes = ref<Note[]>([]);
+  const selectedNoteId = ref<number | null>(null);
+  const storeApiError = ref<ApiException | null>(null);
 
-  const selectedNote = ref<Note | null>(null);
+  const selectedNote = computed(
+    () => notes.value.find((item) => item.id === selectedNoteId.value) || null,
+  );
 
-  const setSelectedNote = (note: Note) => {
-    selectedNote.value = note;
-    notes.value = notes.value.map((item) => {
-      if (item.id === note.id) {
-        return note;
-      }
-      return item;
-    });
+  const fetchNotes = async () => {
+    const { data, error } = await useRequest<Note[]>('/api/note');
+    if (data.value) {
+      notes.value = data.value;
+    } else if (error.value) {
+      storeApiError.value = error.value;
+    }
   };
 
-  const deleteNote = (noteId: number) => {
-    notes.value = notes.value.filter((item) => item.id !== noteId);
-    if (selectedNote?.value?.id === noteId) {
-      selectedNote.value = null;
+  const deleteNote = async (noteId: number) => {
+    // notes.value = notes.value.filter((item) => item.id !== noteId);
+    // if (selectedNoteId?.value === noteId) {
+    //   selectedNoteId.value = null;
+    // }
+    const { error } = await useRequest(`/api/note/${noteId}`, null, 'DELETE');
+
+    if (error.value) {
+      storeApiError.value = error.value;
+      return;
+    }
+
+    await fetchNotes();
+    if (selectedNoteId?.value === noteId) {
+      selectedNoteId.value = null;
     }
   };
 
@@ -37,15 +51,41 @@ export const useNoteStore = defineStore('note', () => {
 
     if (data.value) {
       notes.value.unshift(data.value);
-      setSelectedNote(data.value);
+      selectedNoteId.value = data.value.id;
+    }
+  };
+
+  const updateNote = async (id:number, title:string, content:string) => {
+    const body = {
+      title,
+      content,
+    };
+    const { data, error } = await useRequest<Note>(`/api/note/${id}`, body, 'PUT');
+
+    if (error.value) {
+      storeApiError.value = error.value;
+      return;
+    }
+
+    if (data.value) {
+      // notes.value = notes.value.map((item) => {
+      //   if (item.id === data.value?.id) {
+      //     return data.value;
+      //   }
+      //   return item;
+      // });
+      await fetchNotes();
     }
   };
 
   return {
     notes,
     selectedNote,
-    setSelectedNote,
+    fetchNotes,
     deleteNote,
     addNote,
+    updateNote,
+    selectedNoteId,
+    storeApiError,
   };
 });
