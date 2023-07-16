@@ -1,18 +1,17 @@
 <template>
   <div class="app-auth__wrapper">
     <div class="app-auth__container">
+      <span style="margin-bottom: 16px">(root root)</span>
       <label class="app-auth__label">Email</label>
-      <input v-model="emailData" type="text" class="app-auth__input">
+      <input v-model="emailData" @keydown.enter="handleLogin" type="text" class="app-auth__input">
       <label class="app-auth__label">Password</label>
-      <input v-model="passwordData" type="password" class="app-auth__input">
+      <input v-model="passwordData" @keydown.enter="handleLogin" type="password" class="app-auth__input">
       <div class="app-auth__buttons">
         <button class="app-auth__button" @click="handleLogin" type="submit">Login</button>
-        <button class="app-auth__button" @click="handleRegister" type="submit">Register (W.I.P.)</button>
+        <!--        <button class="app-auth__button" @click="handleRegister" type="submit">Register (W.I.P.)</button>-->
       </div>
     </div>
-    <div v-if="error">
-      <AppError :error="error" />
-    </div>
+    <AppError v-if="store.storeApiError" :error="store.storeApiError" />
   </div>
 </template>
 
@@ -20,44 +19,32 @@
 
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useRequest } from '@/hooks/useRequest';
-import { AuthRes } from '@/components/app-auth/types';
-import { ApiException } from '@/types/commonTypes';
+import { useUserStore } from '@/stores/useUserStore';
 import AppError from '@/components/app-error/App-Error.vue';
 
+const store = useUserStore();
 const router = useRouter();
 
 const emailData = ref<string>('');
 const passwordData = ref<string>('');
-const error = ref<ApiException | null>(null);
 
-// @TODO: try catch
 const handleLogin = async () => {
-  const res = await useRequest<AuthRes>('/api/auth/signin', {
-    email: emailData.value,
-    password: passwordData.value,
-  }, 'POST');
-
-  if (res.data.value) {
-    localStorage.setItem('KEEPER_TOKEN', res.data.value.token);
-    await router.push({ name: 'home' });
-  } else if (res.error.value) {
-    error.value = res.error.value;
-  }
+  await store.signin(emailData.value, passwordData.value);
+  await router.push({ name: 'home' });
 };
 
-// @TODO: try catch
-const handleRegister = async () => {
-  const res = await useRequest<AuthRes>('/api/auth/signup', {
-    email: emailData.value,
-    password: passwordData.value,
-  }, 'POST');
-
-  if (res.data.value) {
-    localStorage.setItem('KEEPER_TOKEN', res.data.value.token);
-    await router.push({ name: 'home' });
-  }
-};
+// // @TODO: try catch
+// const handleRegister = async () => {
+//   const res = await useRequest<AuthRes>('/api/auth/signup', {
+//     email: emailData.value,
+//     password: passwordData.value,
+//   }, 'POST');
+//
+//   if (res.data.value) {
+//     localStorage.setItem('KEEPER_TOKEN', res.data.value.token);
+//     await router.push({ name: 'home' });
+//   }
+// };
 
 </script>
 
@@ -99,7 +86,6 @@ const handleRegister = async () => {
 
   &__button {
     margin-top: 44px;
-    margin-left: 20px;
     padding: 8px;
     border: 1px solid #414345;
     border-radius: 4px;

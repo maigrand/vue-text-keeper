@@ -138,7 +138,7 @@ fastify.get('/api/note/:id', async (request, reply) => {
   }
 });
 
-fastify.get('/api/profile', async (request, reply) => {
+fastify.get('/api/user', async (request, reply) => {
   try {
     await timeout();
     const user = {

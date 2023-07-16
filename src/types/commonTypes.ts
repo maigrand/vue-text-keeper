@@ -9,3 +9,12 @@ export type Note = {
     content?: string;
     userId: number,
 }
+
+export type AuthRes = {
+    token: string,
+    tokenType: string
+}
+
+export type User = {
+    email: string,
+}

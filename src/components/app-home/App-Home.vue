@@ -2,7 +2,10 @@
   <div class="app-home__wrapper">
 
     <div class="app-home__header">
-      <span v-if="profileState.data">Current user: {{ profileState.data.email }}</span>
+      <span v-if="userStore.currentUserEmail">
+        Current user:
+        <router-link to="user">{{ userStore.currentUserEmail }}</router-link>
+      </span>
     </div>
 
     <div class="app-home__body">
@@ -18,49 +21,37 @@
         <AppNoteList />
       </div>
 
-      <div v-if="store.selectedNoteId" class="app-home__content">
+      <div v-if="noteStore.selectedNoteId" class="app-home__content">
         <AppNote />
       </div>
 
     </div>
 
-    <AppError v-if="profileState.error" :error="profileState.error" />
-    <AppError v-if="store.storeApiError" :error="store.storeApiError" />
+    <AppError v-if="noteStore.storeApiError" :error="noteStore.storeApiError" />
+    <AppError v-if="userStore.storeApiError" :error="userStore.storeApiError" />
 
   </div>
 </template>
 
 <script lang="ts" setup>
-import {
-  onMounted, reactive, ref,
-} from 'vue';
-import { Profile, ProfileState } from '@/components/app-home/types';
-import { useRequest } from '@/hooks/useRequest';
+import { onMounted, ref } from 'vue';
 import AppError from '@/components/app-error/App-Error.vue';
 import AppNoteList from '@/components/app-note-list/App-Note-List.vue';
 import AppNote from '@/components/app-note/App-Note.vue';
 import { useNoteStore } from '@/stores/useNoteStore';
+import { useUserStore } from '@/stores/useUserStore';
 
-const profileState: ProfileState = reactive({
-  data: null,
-  error: null,
-});
-
-const store = useNoteStore();
+const noteStore = useNoteStore();
+const userStore = useUserStore();
 const newNoteTitle = ref<string | null>(null);
 
 const handleAddNote = () => {
-  store.addNote(newNoteTitle.value);
+  noteStore.addNote(newNoteTitle.value);
   newNoteTitle.value = null;
 };
 
 onMounted(async () => {
-  const { data, error } = await useRequest<Profile>('/api/profile');
-  if (data.value) {
-    profileState.data = data.value;
-  } else if (error.value) {
-    profileState.error = error.value;
-  }
+  await userStore.fetchUser();
 });
 </script>
 
