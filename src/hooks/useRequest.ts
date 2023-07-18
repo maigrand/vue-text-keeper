@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import axios from 'axios';
-import { ApiException } from '@/types/commonTypes';
+import { ApiException } from '@/types/exception.type';
 
 const BACKEND_URL = 'http://localhost:8082';
 

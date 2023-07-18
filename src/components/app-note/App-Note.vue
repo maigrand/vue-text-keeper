@@ -47,27 +47,31 @@ const handleDeleteNote = async () => {
   await store.deleteNote(noteId.value);
 };
 
-onMounted(async () => {
-  title.value = store.selectedNote?.title || '';
-  content.value = store.selectedNote?.content || '';
-});
-
-watch(noteId, async (value) => {
-  if (value) {
-    title.value = store.selectedNote?.title || '';
-    content.value = store.selectedNote?.content || '';
+onMounted(() => {
+  if (store.selectedNote) {
+    title.value = store.selectedNote.title;
+    content.value = store.selectedNote.content;
   }
 });
 
-watch(title, async (value) => {
-  if (value) {
-    await handleUpdateNote();
+watch(noteId, (value) => {
+  if (store.selectedNote) {
+    if (value) {
+      title.value = store.selectedNote.title;
+      content.value = store.selectedNote.content;
+    }
   }
 });
 
-watch(content, async (value) => {
+watch(title, (value) => {
   if (value) {
-    await handleUpdateNote();
+    handleUpdateNote();
+  }
+});
+
+watch(content, (value) => {
+  if (value) {
+    handleUpdateNote();
   }
 });
 

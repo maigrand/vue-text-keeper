@@ -7,7 +7,7 @@
 
 <script lang="ts" setup>
 
-import { ApiException } from '@/types/commonTypes';
+import { ApiException } from '@/types/exception.type';
 
 defineProps<{error: ApiException}>();
 

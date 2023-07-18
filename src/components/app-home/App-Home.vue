@@ -50,8 +50,8 @@ const handleAddNote = () => {
   newNoteTitle.value = null;
 };
 
-onMounted(async () => {
-  await userStore.fetchUser();
+onMounted(() => {
+  userStore.fetchUser();
 });
 </script>
 

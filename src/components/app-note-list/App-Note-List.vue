@@ -32,8 +32,8 @@ const setSelected = (noteId: number) => {
   });
 };
 
-onMounted(async () => {
-  await store.fetchNotes();
+onMounted(() => {
+  store.fetchNotes();
 });
 
 </script>

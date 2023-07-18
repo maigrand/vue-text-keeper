@@ -3,11 +3,21 @@
     <div class="app-auth__container">
       <span style="margin-bottom: 16px">(root root)</span>
       <label class="app-auth__label">Email</label>
-      <input v-model="emailData" @keydown.enter="handleLogin" type="text" class="app-auth__input">
+      <input
+        class="app-auth__input"
+        type="text"
+        v-model="emailData"
+        @keydown.enter="handleLogin"
+      >
       <label class="app-auth__label">Password</label>
-      <input v-model="passwordData" @keydown.enter="handleLogin" type="password" class="app-auth__input">
+      <input
+        class="app-auth__input"
+        type="password"
+        v-model="passwordData"
+        @keydown.enter="handleLogin"
+      >
       <div class="app-auth__buttons">
-        <button class="app-auth__button" @click="handleLogin" type="submit">Login</button>
+        <button class="app-auth__button" type="submit" @click="handleLogin">Login</button>
         <!--        <button class="app-auth__button" @click="handleRegister" type="submit">Register (W.I.P.)</button>-->
       </div>
     </div>

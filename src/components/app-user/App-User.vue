@@ -11,7 +11,7 @@ import { useUserStore } from '@/stores/useUserStore';
 
 const store = useUserStore();
 
-onMounted(async () => {
-  await store.fetchUser();
+onMounted(() => {
+  store.fetchUser();
 });
 </script>

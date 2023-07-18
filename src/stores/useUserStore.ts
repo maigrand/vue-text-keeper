@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRequest } from '@/hooks/useRequest';
-import { ApiException, AuthRes, User } from '@/types/commonTypes';
+import { ApiException } from '@/types/exception.type';
+import { User, UserAuthRes } from '@/types/user.type';
 
 export const useUserStore = defineStore('user', () => {
   const currentUserEmail = ref<string>('');
@@ -25,7 +26,7 @@ export const useUserStore = defineStore('user', () => {
       email,
       password,
     };
-    const { data, error } = await useRequest<AuthRes>('/api/auth/signin', body, 'POST');
+    const { data, error } = await useRequest<UserAuthRes>('/api/auth/signin', body, 'POST');
 
     if (error.value) {
       storeApiError.value = error.value;

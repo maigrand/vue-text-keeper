@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { ApiException, Note } from '@/types/commonTypes';
 import { useRequest } from '@/hooks/useRequest';
+import { Note } from '@/types/note.type';
+import { ApiException } from '@/types/exception.type';
 
 export const useNoteStore = defineStore('note', () => {
   const notes = ref<Note[]>([]);
@@ -15,17 +16,19 @@ export const useNoteStore = defineStore('note', () => {
   const fetchNotes = async () => {
     const { data, error } = await useRequest<Note[]>('/api/note');
     if (data.value) {
-      notes.value = data.value;
+      notes.value = data.value.map((item) => {
+        const updatedItem = { ...item };
+        if (!updatedItem.content) {
+          updatedItem.content = '';
+        }
+        return updatedItem;
+      });
     } else if (error.value) {
       storeApiError.value = error.value;
     }
   };
 
   const deleteNote = async (noteId: number) => {
-    // notes.value = notes.value.filter((item) => item.id !== noteId);
-    // if (selectedNoteId?.value === noteId) {
-    //   selectedNoteId.value = null;
-    // }
     const { error } = await useRequest(`/api/note/${noteId}`, null, 'DELETE');
 
     if (error.value) {
@@ -68,12 +71,6 @@ export const useNoteStore = defineStore('note', () => {
     }
 
     if (data.value) {
-      // notes.value = notes.value.map((item) => {
-      //   if (item.id === data.value?.id) {
-      //     return data.value;
-      //   }
-      //   return item;
-      // });
       await fetchNotes();
     }
   };
